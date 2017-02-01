@@ -9,7 +9,7 @@ import (
 )
 
 func GroupsHelp(i *Irc, command *Command) {
-	jww.DEBUG.Println("In UsersHelp")
+	jww.DEBUG.Println("In GroupsHelp")
 	help := []HelpFmt{
 		HelpFmt{
 			Cmd:   "groups",
@@ -117,7 +117,9 @@ func GroupsDel(i *Irc, command *Command) {
 }
 
 func GroupsAddMembers(i *Irc, command *Command) {
-	if len(command.Args) == 2 {
+	jww.DEBUG.Printf("GAM: %+v", command)
+	jww.DEBUG.Printf("Args: %d", len(command.Args))
+	if len(command.Args) != 2 {
 		GroupsHelp(i, command)
 		return
 	}
@@ -142,7 +144,7 @@ func GroupsAddMembers(i *Irc, command *Command) {
 }
 
 func GroupsDelMembers(i *Irc, command *Command) {
-	if len(command.Args) == 2 {
+	if len(command.Args) != 2 {
 		GroupsHelp(i, command)
 		return
 	}
@@ -167,7 +169,7 @@ func GroupsDelMembers(i *Irc, command *Command) {
 }
 
 func GroupsAddAdmins(i *Irc, command *Command) {
-	if len(command.Args) == 2 {
+	if len(command.Args) != 2 {
 		GroupsHelp(i, command)
 		return
 	}
@@ -192,7 +194,7 @@ func GroupsAddAdmins(i *Irc, command *Command) {
 }
 
 func GroupsDelAdmins(i *Irc, command *Command) {
-	if len(command.Args) == 2 {
+	if len(command.Args) != 2 {
 		GroupsHelp(i, command)
 		return
 	}
