@@ -136,3 +136,7 @@ func (c *Commands) HandleFunc(name string, hf HandlerFunc) Remover {
 func (c *Commands) Handle(name string, h Handler) Remover {
 	return c.Handlers.add(name, h)
 }
+
+func AddFunc(c *Commands, h *Commands, name string, cf HandlerFunc, hf HandlerFunc) (Remover, Remover) {
+	return c.HandleFunc(name, cf), h.HandleFunc(name, hf)
+}

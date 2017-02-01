@@ -2,18 +2,36 @@ package database
 
 import (
 	"os"
+	"sync"
 	"time"
 
 	"github.com/asdine/storm"
 	"github.com/boltdb/bolt"
 	jww "github.com/spf13/jwalterweatherman"
+	"github.com/spf13/viper"
 )
-
-// Stop being so dense. Make it non-generic to get it done
 
 type Database struct {
 	Db    string
 	DbObj *storm.DB
+}
+
+var instance *Database
+var open, close sync.Once
+
+func GetInstance() *Database {
+	open.Do(func() {
+		db := viper.GetString("Database")
+		instance = &Database{Db: db}
+		instance.Open()
+	})
+	return instance
+}
+
+func CloseInstance() {
+	close.Do(func() {
+		instance.Close()
+	})
 }
 
 func (d *Database) Open() {
@@ -33,27 +51,5 @@ func (d *Database) Close() {
 	jww.DEBUG.Println("Closing DB:", d.Db)
 	if err := d.DbObj.Close(); err != nil {
 		jww.ERROR.Println(err)
-	}
-}
-
-type DataS interface {
-	Save(*Database)
-	Delete(*Database)
-	Update(*Database)
-	UpdateField(*Database, string, string)
-	GetOne(*Database, string, string)
-}
-
-func GetAll(db *Database, d interface{}) {
-	jww.DEBUG.Printf("Getting all: %T", d)
-	if err := db.DbObj.All(d); err != nil {
-		jww.ERROR.Printf("Failure to get all: %+v", d)
-	}
-}
-
-func GetAllByIndex(db *Database, field string, d interface{}) {
-	jww.DEBUG.Printf("Getting all: %T (i:%s)", d, field)
-	if err := db.DbObj.AllByIndex(field, d); err != nil {
-		jww.ERROR.Printf("Failure to get by indexed field: %s", field)
 	}
 }

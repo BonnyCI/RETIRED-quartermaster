@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/pschwartz/quartermaster/bot"
+	"github.com/pschwartz/quartermaster/database"
 )
 
 // getCmd represents the get command
@@ -19,6 +20,8 @@ var botCmd = &cobra.Command{
 			return err
 		}
 
+		database.GetInstance()
+
 		jww.INFO.Println("GET - Server: ", viper.GetString("server"))
 		jww.INFO.Println("GET - Port: ", viper.GetString("port"))
 		jww.INFO.Println("GET - Debug: ", viper.GetString("debug"))
@@ -26,6 +29,8 @@ var botCmd = &cobra.Command{
 		i := bot.Irc{}
 		bot.Configure(&i)
 		i.Connect()
+		defer database.CloseInstance()
+
 		return nil
 	},
 }

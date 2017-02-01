@@ -9,6 +9,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 
+	"github.com/pschwartz/quartermaster/database"
 	"github.com/pschwartz/quartermaster/helpers"
 )
 
@@ -44,27 +45,21 @@ func Configure(i *Irc) {
 
 func (i *Irc) addCommands() {
 	i.commands = &Commands{Handlers: HandlerSet()}
-	i.commands.HandleFunc("", Help)
-	i.commands.HandleFunc("help", Help)
-	i.commands.HandleFunc("notify", Notify)
-	i.commands.HandleFunc("ping", Ping)
-	i.commands.HandleFunc("status", Status)
-	i.commands.HandleFunc("users", Users)
-	i.commands.HandleFunc("quit", Quit)
-}
-
-func (i *Irc) buildHelp() {
 	i.help = &Commands{Handlers: HandlerSet()}
-	i.help.HandleFunc("help", HelpHelp)
-	i.help.HandleFunc("notify", NotifyHelp)
-	i.help.HandleFunc("ping", PingHelp)
-	i.help.HandleFunc("status", StatusHelp)
-	i.help.HandleFunc("users", UsersHelp)
+
+	i.commands.HandleFunc("", Help)
+	i.commands.HandleFunc("quit", Quit) //Needs admin perms enforcement
+
+	AddFunc(i.commands, i.help, "help", Help, HelpHelp)
+	AddFunc(i.commands, i.help, "notify", Notify, NotifyHelp)
+	AddFunc(i.commands, i.help, "ping", Ping, PingHelp)
+	AddFunc(i.commands, i.help, "status", Status, StatusHelp)
+	AddFunc(i.commands, i.help, "users", Users, UsersHelp)
+	AddFunc(i.commands, i.help, "groups", Groups, GroupsHelp)
 }
 
 func (i *Irc) Connect() {
 	i.addCommands()
-	i.buildHelp()
 	i.Conn.EnableStateTracking()
 	i.Conn.HandleFunc(irc.CONNECTED, func(conn *irc.Conn, line *irc.Line) {
 		channels := strings.Split(viper.GetString("channels"), ",")
@@ -101,6 +96,7 @@ func (i *Irc) Connect() {
 }
 
 func (i *Irc) Disconnect() {
+	database.CloseInstance()
 	jww.INFO.Println("Disconnecting from IRC Server")
 	i.Conn.Quit("Quatermaster is walking the plank!")
 	i.quit <- true

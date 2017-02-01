@@ -84,7 +84,6 @@ func InitializeConfig(subCmdVs ...*cobra.Command) error {
 
 	jww.INFO.Println("Using config file:", viper.ConfigFileUsed())
 	return nil
-
 }
 
 func initializeFlags(cmd *cobra.Command) {

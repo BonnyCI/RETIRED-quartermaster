@@ -1,0 +1,25 @@
+package lib
+
+import "time"
+
+const DFMT = "2006-01-02"
+
+var DStamp = time.Now().UTC().Format(DFMT)
+
+func Remove(list []string, rm string) []string {
+	for k, v := range list {
+		if v == rm {
+			return append(list[:k], list[k+1:]...)
+		}
+	}
+	return list
+}
+
+func RemoveIndex(list []string, i int) []string {
+	for k := range list {
+		if k == i {
+			return append(list[:k], list[k+1:]...)
+		}
+	}
+	return list
+}

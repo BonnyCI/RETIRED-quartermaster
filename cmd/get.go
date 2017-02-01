@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/database"
+	"github.com/pschwartz/quartermaster/lib"
 )
 
 // getCmd represents the get command
@@ -23,29 +23,12 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		db := &database.Database{Db: "test.db"}
-		jww.DEBUG.Println("DB: ", db.Db)
+		lib.AddUsers([]string{"phschwartz"})
+		u, _ := lib.GetUser("phschwartz")
+		st := lib.GetStatus(u, lib.DStamp)
 
-		db.Open()
-		defer db.Close()
-
-		ps := database.UserS{Irc: "phschwartz", Gh: "pschwartz"}
-		mm := database.UserS{Irc: "mms", Gh: "mms"}
-
-		ps.Save(db)
-		mm.Save(db)
-
-		var qr database.UserS
-		qr.GetOne(db, "Irc", "phschwartz")
-
-		jww.DEBUG.Printf("%+v", qr)
-
-		qr.GetOne(db, "Irc", "mms")
-		jww.DEBUG.Printf("%+v", qr)
-
-		var qa []database.UserS
-		database.GetAll(db, &qa)
-		jww.DEBUG.Printf("%+v", qa)
+		jww.DEBUG.Printf("u: %+v", u)
+		jww.DEBUG.Printf("st: %+v", st)
 
 		return nil
 	},
