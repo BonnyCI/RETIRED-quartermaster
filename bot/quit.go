@@ -1,6 +1,10 @@
 package bot
 
-import jww "github.com/spf13/jwalterweatherman"
+import (
+	jww "github.com/spf13/jwalterweatherman"
+
+	"github.com/pschwartz/quartermaster/lib"
+)
 
 func Quit(i *Irc, command *Command) {
 	u, err := lib.GetUser(command.Sender)
