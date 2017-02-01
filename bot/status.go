@@ -78,6 +78,10 @@ func StatusGet(i *Irc, command *Command) {
 }
 
 func StatusDel(i *Irc, command *Command) {
+	if len(command.Args) == 0 {
+		StatusHelp(i, command)
+		return
+	}
 	if len(command.Args) == 1 {
 		command.Args = append(command.Args, lib.DStamp)
 	}

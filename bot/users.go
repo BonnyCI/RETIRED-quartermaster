@@ -42,11 +42,19 @@ func UsersBase(i *Irc, command *Command) {
 }
 
 func UsersAdd(i *Irc, command *Command) {
+	if len(command.Args) == 0 {
+		UsersHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Adding User(s): %+v", command.Args)
 	lib.AddUsers(strings.Split(command.Args[0], ","))
 }
 
 func UsersDel(i *Irc, command *Command) {
+	if len(command.Args) == 0 {
+		UsersHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Deleting User(s): %+v", command.Args)
 	lib.DelUsers(strings.Split(command.Args[0], ","))
 }

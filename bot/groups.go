@@ -63,16 +63,28 @@ func GroupsBase(i *Irc, command *Command) {
 }
 
 func GroupsAdd(i *Irc, command *Command) {
+	if len(command.Args) == 0 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Adding Group(s): %+v", command.Args)
 	lib.AddGroups(strings.Split(command.Args[0], ","))
 }
 
 func GroupsDel(i *Irc, command *Command) {
+	if len(command.Args) == 0 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Deleting Group(s): %+v", command.Args)
 	lib.DelGroups(strings.Split(command.Args[0], ","))
 }
 
 func GroupsAddMembers(i *Irc, command *Command) {
+	if len(command.Args) == 2 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Adding Members(s) to Group(s): %+v to %+v", command.Args[1], command.Args[0])
 	g := strings.Split(command.Args[0], ",")
 	u := strings.Split(command.Args[1], ",")
@@ -80,6 +92,10 @@ func GroupsAddMembers(i *Irc, command *Command) {
 }
 
 func GroupsDelMembers(i *Irc, command *Command) {
+	if len(command.Args) == 2 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Deleting User(s) from Group(s): %+v to %+v", command.Args[0], command.Args[1])
 	g := strings.Split(command.Args[0], ",")
 	u := strings.Split(command.Args[1], ",")
@@ -87,6 +103,10 @@ func GroupsDelMembers(i *Irc, command *Command) {
 }
 
 func GroupsAddAdmins(i *Irc, command *Command) {
+	if len(command.Args) == 2 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Adding Admin(s) to Group(s): %+v to %+v", command.Args[1], command.Args[0])
 	g := strings.Split(command.Args[0], ",")
 	u := strings.Split(command.Args[1], ",")
@@ -94,6 +114,10 @@ func GroupsAddAdmins(i *Irc, command *Command) {
 }
 
 func GroupsDelAdmins(i *Irc, command *Command) {
+	if len(command.Args) == 2 {
+		GroupsHelp(i, command)
+		return
+	}
 	jww.DEBUG.Printf("Deleting User(s) from Group(s): %+v to %+v", command.Args[0], command.Args[1])
 	g := strings.Split(command.Args[0], ",")
 	u := strings.Split(command.Args[1], ",")
