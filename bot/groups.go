@@ -67,6 +67,20 @@ func GroupsAdd(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Adding Group(s): %+v", command.Args)
 	lib.AddGroups(strings.Split(command.Args[0], ","))
 }
@@ -76,8 +90,30 @@ func GroupsDel(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Deleting Group(s): %+v", command.Args)
-	lib.DelGroups(strings.Split(command.Args[0], ","))
+	groups := strings.Split(command.Args[0], ",")
+	if fnd, _ := lib.In("Admin", groups); fnd {
+		efmt := "User (%s) is not authorized to delete Admin group."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	lib.DelGroups(groups)
 }
 
 func GroupsAddMembers(i *Irc, command *Command) {
@@ -85,10 +121,24 @@ func GroupsAddMembers(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Adding Members(s) to Group(s): %+v to %+v", command.Args[1], command.Args[0])
-	g := strings.Split(command.Args[0], ",")
-	u := strings.Split(command.Args[1], ",")
-	lib.AddUsersToGroups("Member", g, u)
+	gs := strings.Split(command.Args[0], ",")
+	us := strings.Split(command.Args[1], ",")
+	lib.AddUsersToGroups("Member", gs, us)
 }
 
 func GroupsDelMembers(i *Irc, command *Command) {
@@ -96,10 +146,24 @@ func GroupsDelMembers(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Deleting User(s) from Group(s): %+v to %+v", command.Args[0], command.Args[1])
-	g := strings.Split(command.Args[0], ",")
-	u := strings.Split(command.Args[1], ",")
-	lib.DelUsersFromGroups("Member", g, u)
+	gs := strings.Split(command.Args[0], ",")
+	us := strings.Split(command.Args[1], ",")
+	lib.DelUsersFromGroups("Member", gs, us)
 }
 
 func GroupsAddAdmins(i *Irc, command *Command) {
@@ -107,10 +171,24 @@ func GroupsAddAdmins(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Adding Admin(s) to Group(s): %+v to %+v", command.Args[1], command.Args[0])
-	g := strings.Split(command.Args[0], ",")
-	u := strings.Split(command.Args[1], ",")
-	lib.AddUsersToGroups("Admin", g, u)
+	gs := strings.Split(command.Args[0], ",")
+	us := strings.Split(command.Args[1], ",")
+	lib.AddUsersToGroups("Admin", gs, us)
 }
 
 func GroupsDelAdmins(i *Irc, command *Command) {
@@ -118,10 +196,24 @@ func GroupsDelAdmins(i *Irc, command *Command) {
 		GroupsHelp(i, command)
 		return
 	}
+	u, err := lib.GetUser(command.Sender)
+	if err != nil {
+		efmt := "User (%s) is not registered."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
+
+	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+		efmt := "User (%s) is not authorized to perform this action."
+		jww.ERROR.Printf(efmt, command.Sender)
+		i.Sendf(command.Target, efmt, command.Sender)
+		return
+	}
 	jww.DEBUG.Printf("Deleting User(s) from Group(s): %+v to %+v", command.Args[0], command.Args[1])
-	g := strings.Split(command.Args[0], ",")
-	u := strings.Split(command.Args[1], ",")
-	lib.DelUsersFromGroups("Admin", g, u)
+	gs := strings.Split(command.Args[0], ",")
+	us := strings.Split(command.Args[1], ",")
+	lib.DelUsersFromGroups("Admin", gs, us)
 }
 
 func Groups(i *Irc, command *Command) {

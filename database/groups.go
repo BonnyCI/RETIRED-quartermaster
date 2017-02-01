@@ -9,13 +9,24 @@ import (
 type GroupS struct {
 	ID      int
 	Name    string `storm:"index,unique"`
-	Members []string
-	Admins  []string
+	Members []UserS
+	Admins  []UserS
 }
 
 func (s *GroupS) String() string {
-	m := strings.Join(s.Members, ",")
-	a := strings.Join(s.Admins, ",")
+	var as, ms []string
+
+	for _, v := range s.Admins {
+		as = append(as, v.Nick)
+	}
+
+	for _, v := range s.Members {
+		ms = append(ms, v.Nick)
+	}
+
+	m := strings.Join(ms, ",")
+	a := strings.Join(as, ",")
+
 	return "Group(" + s.Name + " A:" + a + " M:" + m + ")"
 }
 

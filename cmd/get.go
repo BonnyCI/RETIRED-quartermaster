@@ -23,7 +23,10 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
+		lib.AddGroups([]string{"Admin"})
 		lib.AddUsers([]string{"phschwartz"})
+		lib.AddUsersToGroups("Admin", []string{"Admin"}, []string{"phschwartz"})
+
 		u, _ := lib.GetUser("phschwartz")
 		st := lib.GetStatus(u, lib.DStamp)
 

@@ -48,11 +48,17 @@ func AddUsersToGroups(t string, gs []string, us []string) {
 	var grs []database.GroupS
 	for _, g := range gs {
 		gr := GetGroup(g)
-		switch t {
-		case "Member":
-			gr.Members = append(gr.Members, us...)
-		case "Admin":
-			gr.Admins = append(gr.Admins, us...)
+		for _, v := range us {
+			u, _ := GetUser(v)
+			if UserInGroup(g, u) {
+				continue
+			}
+			switch t {
+			case "Member":
+				gr.Members = append(gr.Members, u)
+			case "Admin":
+				gr.Admins = append(gr.Admins, u)
+			}
 		}
 		grs = append(grs, gr)
 	}
@@ -64,7 +70,8 @@ func DelUsersFromGroups(t string, gs []string, us []string) {
 	var grs []database.GroupS
 	for _, g := range gs {
 		gr := GetGroup(g)
-		for _, u := range us {
+		for _, v := range us {
+			u, _ := GetUser(v)
 			switch t {
 			case "Member":
 				gr.Members = Remove(gr.Members, u)
@@ -76,4 +83,20 @@ func DelUsersFromGroups(t string, gs []string, us []string) {
 	}
 	ModifyGroups(grs)
 
+}
+
+func UserInGroup(n string, u database.UserS) bool {
+	g := GetGroup(n)
+	for _, v := range g.Admins {
+		if v.Nick == u.Nick {
+			return true
+		}
+	}
+
+	for _, v := range g.Members {
+		if v.Nick == u.Nick {
+			return true
+		}
+	}
+	return false
 }
