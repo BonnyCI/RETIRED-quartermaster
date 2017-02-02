@@ -54,6 +54,7 @@ func Execute() {
 func AddCommands() {
 	quartermasterCmd.AddCommand(botCmd)
 	quartermasterCmd.AddCommand(getCmd)
+	quartermasterCmd.AddCommand(initCmd)
 	quartermasterCmd.AddCommand(versionCmd)
 }
 

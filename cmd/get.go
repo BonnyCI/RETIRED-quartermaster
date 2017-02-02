@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	jww "github.com/spf13/jwalterweatherman"
-
-	"github.com/pschwartz/quartermaster/lib"
 )
 
 // getCmd represents the get command
@@ -22,16 +19,6 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-
-		lib.AddGroups([]string{"Admin"})
-		lib.AddUsers([]string{"phschwartz"})
-		lib.AddUsersToGroups("Admin", []string{"Admin"}, []string{"phschwartz"})
-
-		u, _ := lib.GetUser("phschwartz")
-		st := lib.GetStatus(u, lib.DStamp)
-
-		jww.DEBUG.Printf("u: %+v", u)
-		jww.DEBUG.Printf("st: %+v", st)
 
 		return nil
 	},
