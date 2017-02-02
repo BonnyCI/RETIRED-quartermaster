@@ -6,9 +6,9 @@ import (
 )
 
 type DataS interface {
-	Save()
-	Delete()
-	Update(DataS)
+	Save() error
+	Delete() error
+	Update(DataS) error
 }
 
 func GetAll(d interface{}) error {
