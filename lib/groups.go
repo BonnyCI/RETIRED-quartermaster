@@ -1,98 +1,124 @@
 package lib
 
 import (
+	"fmt"
+
 	"github.com/pschwartz/quartermaster/database"
 )
 
-func ListGroups() []database.GroupS {
+func ListGroups() ([]database.GroupS, error) {
 	var dg []database.GroupS
-	database.GetAll(&dg)
-	return dg
+	if err := database.GetAll(&dg); err != nil {
+		return dg, err
+	}
+	return dg, nil
 }
 
-func GetGroup(n string) database.GroupS {
+func GetGroup(n string) (database.GroupS, error) {
 	var g database.GroupS
-	database.One("Name", n, &g)
-	return g
+	if err := database.One("Name", n, &g); err != nil {
+		return g, fmt.Errorf("Group: %s does not exist.", n)
+	}
+	return g, nil
 }
 
-func addGroup(gs string) {
+func addGroup(gs string) error {
 	g := database.GroupS{Name: gs}
-	g.Save()
-}
-
-func AddGroups(gs []string) {
-	for _, g := range gs {
-		addGroup(g)
+	if err := g.Save(); err != nil {
+		return err
 	}
+	return nil
 }
 
-func delGroup(gs string) {
-	g := GetGroup(gs)
-	g.Delete()
-}
-
-func DelGroups(gs []string) {
+func AddGroups(gs []string) error {
 	for _, g := range gs {
-		delGroup(g)
+		if err := addGroup(g); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func ModifyGroups(gs []database.GroupS) {
+func delGroup(gs string) error {
+	var g database.GroupS
+	var err error
+	if g, err = GetGroup(gs); err != nil {
+		return err
+	}
+	if err = g.Delete(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelGroups(gs []string) error {
 	for _, g := range gs {
-		g.Update()
+		if err := delGroup(g); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func AddUsersToGroups(t string, gs []string, us []string) {
+func ModifyGroups(gs []database.GroupS) error {
+	for _, g := range gs {
+		if err := g.Update(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func AddUsersToGroups(gs []string, us []string) error {
+	var err error
 	var grs []database.GroupS
 	for _, g := range gs {
-		gr := GetGroup(g)
+		var gr database.GroupS
+		if gr, err = GetGroup(g); err != nil {
+			return err
+		}
 		for _, v := range us {
-			u, _ := GetUser(v)
+			var u database.UserS
+			if u, err = GetUser(v); err != nil {
+				return fmt.Errorf("Attempting to add %s to %s, user does not exist.", v, g)
+			}
 			if UserInGroup(g, u) {
 				continue
 			}
-			switch t {
-			case "Member":
-				gr.Members = append(gr.Members, u)
-			case "Admin":
-				gr.Admins = append(gr.Admins, u)
-			}
+			gr.Members = append(gr.Members, u)
 		}
 		grs = append(grs, gr)
 	}
 	ModifyGroups(grs)
+	return nil
 
 }
 
-func DelUsersFromGroups(t string, gs []string, us []string) {
+func DelUsersFromGroups(gs []string, us []string) error {
+	var err error
 	var grs []database.GroupS
 	for _, g := range gs {
-		gr := GetGroup(g)
+		var gr database.GroupS
+		if gr, err = GetGroup(g); err != nil {
+			return err
+		}
 		for _, v := range us {
 			u, _ := GetUser(v)
-			switch t {
-			case "Member":
-				gr.Members = Remove(gr.Members, u)
-			case "Admin":
-				gr.Admins = Remove(gr.Admins, u)
-			}
+			gr.Members = Remove(gr.Members, u)
 		}
 		grs = append(grs, gr)
 	}
 	ModifyGroups(grs)
+	return nil
 
 }
 
 func UserInGroup(n string, u database.UserS) bool {
-	g := GetGroup(n)
-	for _, v := range g.Admins {
-		if v.Nick == u.Nick {
-			return true
-		}
+	var err error
+	var g database.GroupS
+	if g, err = GetGroup(n); err != nil {
+		return false
 	}
-
 	for _, v := range g.Members {
 		if v.Nick == u.Nick {
 			return true

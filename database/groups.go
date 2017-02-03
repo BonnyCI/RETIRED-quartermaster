@@ -10,46 +10,46 @@ type GroupS struct {
 	ID      int
 	Name    string `storm:"index,unique"`
 	Members []UserS
-	Admins  []UserS
 }
 
 func (s *GroupS) String() string {
-	var as, ms []string
-
-	for _, v := range s.Admins {
-		as = append(as, v.Nick)
-	}
+	var ms []string
 
 	for _, v := range s.Members {
 		ms = append(ms, v.Nick)
 	}
 
 	m := strings.Join(ms, ",")
-	a := strings.Join(as, ",")
 
-	return "Group(" + s.Name + " A:" + a + " M:" + m + ")"
+	return "(" + s.Name + " M:" + m + ")"
 }
 
-func (s *GroupS) Save() {
+func (s *GroupS) Save() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Saving: %+v", s)
 	if err := db.DbObj.Save(s); err != nil {
 		jww.ERROR.Printf("Failure to Save: %+v", s)
+		return err
 	}
+	return nil
 }
 
-func (s *GroupS) Delete() {
+func (s *GroupS) Delete() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Deleting: %+v", s)
 	if err := db.DbObj.DeleteStruct(s); err != nil {
 		jww.ERROR.Printf("Failure to Delete: %+v", s)
+		return err
 	}
+	return nil
 }
 
-func (s *GroupS) Update() {
+func (s *GroupS) Update() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Updating: %+v", s)
 	if err := db.DbObj.Update(s); err != nil {
 		jww.ERROR.Printf("Failure to Update: %+v", s)
+		return err
 	}
+	return nil
 }
