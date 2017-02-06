@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+    "github.com/pschwartz/quartermaster/web"
 )
 
 // getCmd represents the get command
@@ -18,6 +20,12 @@ to quickly create a Cobra application.`,
 		err := InitializeConfig()
 		if err != nil {
 			return err
+		}
+
+		web.BackupHTTP()
+		web.ApiHTTP()
+
+		for {
 		}
 
 		return nil

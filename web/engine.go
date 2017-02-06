@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/mux"
 	jww "github.com/spf13/jwalterweatherman"
 )
 
@@ -31,9 +32,7 @@ func GetEngine(e string) *Engine {
 	return engines[e]
 }
 
-type HandleFunc func(http.ResponseWriter, *http.Request)
-
-// Copyright 2016 stackoverflow.com http://stackoverflow.com/39320025/go-how-to-stop-http-listenandserve
+// Copyright 2016 stackoverflow.com http://stackoverflow.com/questions/39320025/go-how-to-stop-http-listenandserve
 
 type tcpKeepAliveListener struct {
 	*net.TCPListener
@@ -50,10 +49,10 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	return tc, nil
 }
 
-func ListenAndServeWithClose(addr string) (sc io.Closer, err error) {
+func ListenAndServeWithClose(addr string, handler http.Handler) (sc io.Closer, err error) {
 	var listener net.Listener
 
-	srv := &http.Server{Addr: addr}
+	srv := &http.Server{Addr: addr, Handler: handler}
 
 	if addr == "" {
 		addr = ":http"
@@ -74,8 +73,22 @@ func ListenAndServeWithClose(addr string) (sc io.Closer, err error) {
 	return listener, nil
 }
 
+type HandlersS struct {
+	Method  string
+	Handler http.HandlerFunc
+}
+
+type HandlersT map[string][]HandlersS
+
+func MakeHandler(m string, h http.HandlerFunc) HandlersS {
+	return HandlersS{
+		Method:  m,
+		Handler: h,
+	}
+}
+
 type EngineI interface {
-	Add(string, HandleFunc)
+	Add(string, http.HandlerFunc)
 	Remove(string)
 	Start()
 	SetAddr(string)
@@ -84,17 +97,18 @@ type EngineI interface {
 type Engine struct {
 	name     string
 	addr     string
-	Handlers map[string]HandleFunc
+	Handlers HandlersT
+	Router   *mux.Router
 	Closer   io.Closer
 }
 
 func NewEngine(n string) *Engine {
 	jww.INFO.Printf("Creating new engine: %s", n)
-	m := make(map[string]HandleFunc)
-	return &Engine{name: n, addr: "", Handlers: m}
+	m := make(HandlersT)
+	return &Engine{name: n, addr: "", Handlers: m, Router: mux.NewRouter()}
 }
 
-func (e *Engine) Add(p string, f HandleFunc) {
+func (e *Engine) Add(p string, f []HandlersS) {
 	if _, ok := e.Handlers[p]; ok {
 		jww.WARN.Printf("Handler %s already in handler map.", p)
 		return
@@ -121,8 +135,11 @@ func (e *Engine) Start() {
 	jww.DEBUG.Println("Building HTTP Engine.")
 	for k, v := range e.Handlers {
 		jww.DEBUG.Printf("Adding Handler %s.", k)
-		http.HandleFunc(k, v)
+
+		for _, h := range v {
+			e.Router.HandleFunc(k, h.Handler).Methods(h.Method)
+		}
 	}
 	jww.INFO.Println("Starting HTTP Engine.")
-	e.Closer, _ = ListenAndServeWithClose(e.addr)
+	e.Closer, _ = ListenAndServeWithClose(e.addr, e.Router)
 }

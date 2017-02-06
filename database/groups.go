@@ -7,9 +7,9 @@ import (
 )
 
 type GroupS struct {
-	ID      int
-	Name    string `storm:"index,unique"`
-	Members []UserS
+	ID      int     `json:"id"`
+	Name    string  `json:"name" storm:"index,unique"`
+	Members []UserS `json:"members,omitempty"`
 }
 
 func (s *GroupS) String() string {
