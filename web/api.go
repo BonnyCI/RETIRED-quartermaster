@@ -32,8 +32,9 @@ func BackupHTTP() {
 func ApiHTTP() {
 	be := GetEngine("api")
 	be.SetAddr(":8888")
-	AddEndpoints(be, usersApi)
 	AddEndpoints(be, groupsApi)
+	AddEndpoints(be, notifyApi)
+	AddEndpoints(be, usersApi)
 	AddEndpoints(be, statusApi)
 	be.Start()
 }
