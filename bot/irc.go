@@ -10,8 +10,8 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 
-	"github.com/pschwartz/quartermaster/database"
-	"github.com/pschwartz/quartermaster/helpers"
+	"github.com/bonnyci/quartermaster/database"
+	"github.com/bonnyci/quartermaster/helpers"
 )
 
 type Irc struct {

@@ -5,7 +5,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 type Group struct {

@@ -1,6 +1,6 @@
 package lib
 
-import "github.com/pschwartz/quartermaster/helpers"
+import "github.com/bonnyci/quartermaster/helpers"
 
 var (
 	// CommitHash contains the current Git revision. Use make to build to make

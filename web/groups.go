@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 type GroupsAPI struct {

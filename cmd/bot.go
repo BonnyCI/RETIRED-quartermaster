@@ -5,9 +5,9 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 
-	"github.com/pschwartz/quartermaster/bot"
-	"github.com/pschwartz/quartermaster/database"
-	"github.com/pschwartz/quartermaster/web"
+	"github.com/bonnyci/quartermaster/bot"
+	"github.com/bonnyci/quartermaster/database"
+	"github.com/bonnyci/quartermaster/web"
 )
 
 // getCmd represents the get command

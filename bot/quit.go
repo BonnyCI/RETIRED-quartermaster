@@ -3,7 +3,7 @@ package bot
 import (
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 func Quit(i *Irc, command *Command) {

@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/bot"
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/bot"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 type NotifyAPI struct {

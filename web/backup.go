@@ -6,7 +6,7 @@ import (
 
 	"github.com/boltdb/bolt"
 
-	"github.com/pschwartz/quartermaster/database"
+	"github.com/bonnyci/quartermaster/database"
 )
 
 type BackupAPI struct {

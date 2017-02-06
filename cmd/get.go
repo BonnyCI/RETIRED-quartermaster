@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-    "github.com/pschwartz/quartermaster/web"
+    "github.com/bonnyci/quartermaster/web"
 )
 
 // getCmd represents the get command
