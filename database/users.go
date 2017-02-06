@@ -5,8 +5,8 @@ import (
 )
 
 type UserS struct {
-	ID   int
-	Nick string `storm:"index,unique"`
+	ID   int    `json:"id"`
+	Nick string `json:"nick" storm:"index,unique"`
 }
 
 func (s *UserS) String() string {

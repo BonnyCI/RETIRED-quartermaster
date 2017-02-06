@@ -5,10 +5,10 @@ import (
 )
 
 type StatusS struct {
-	ID     int
-	Date   string `storm:"index"`
-	Status string
-	User   UserS `storm:"index"`
+	ID     int    `json:"id"`
+	Date   string `json:"date" storm:"index"`
+	Status string `json:"status"`
+	User   UserS  `json:"user" storm:"index"`
 }
 
 func (s *StatusS) String() string {

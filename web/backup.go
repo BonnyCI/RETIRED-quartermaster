@@ -9,7 +9,16 @@ import (
 	"github.com/pschwartz/quartermaster/database"
 )
 
-func BackupHandleFunc(w http.ResponseWriter, rew *http.Request) {
+type BackupAPI struct {
+	Name     string
+	Handlers HandlersT
+}
+
+func (u *BackupAPI) Get() HandlersT {
+	return u.Handlers
+}
+
+func BackupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	db := database.GetInstance()
 	err := db.DbObj.Bolt.View(func(tx *bolt.Tx) error {
 		w.Header().Set("Content-Type", "application/octet-stream")
@@ -24,9 +33,9 @@ func BackupHandleFunc(w http.ResponseWriter, rew *http.Request) {
 	}
 }
 
-func BackupHTTP() {
-	be := GetEngine("backup")
-	be.SetAddr(":12800")
-	be.Add("/backup/", BackupHandleFunc)
-	be.Start()
+var backupAPI = &BackupAPI{
+	Name: "backup",
+	Handlers: HandlersT{
+		"/backup/": []HandlersS{MakeHandler("GET", BackupHandleFunc)},
+	},
 }
