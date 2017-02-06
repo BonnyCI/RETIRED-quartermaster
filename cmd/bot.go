@@ -28,9 +28,10 @@ var botCmd = &cobra.Command{
 		jww.INFO.Println("GET - Debug: ", viper.GetString("debug"))
 
 		web.BackupHTTP()
+		web.ApiHTTP()
 
-		i := bot.Irc{}
-		bot.Configure(&i)
+		i := bot.GetIrc()
+		bot.Configure(i)
 		i.Connect()
 		defer database.CloseInstance()
 

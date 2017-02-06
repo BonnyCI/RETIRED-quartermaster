@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"strconv"
 	"strings"
+	"sync"
 
 	irc "github.com/fluffle/goirc/client"
 	jww "github.com/spf13/jwalterweatherman"
@@ -20,6 +21,16 @@ type Irc struct {
 	help     *Commands
 	quit     chan bool
 	in       chan string
+}
+
+var instance *Irc
+var io sync.Once
+
+func GetIrc() *Irc {
+	io.Do(func() {
+		instance = &Irc{}
+	})
+	return instance
 }
 
 func Configure(i *Irc) {
