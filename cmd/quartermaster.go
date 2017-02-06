@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/pschwartz/quartermaster/helpers"
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/helpers"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 var quartermasterCmd = &cobra.Command{

@@ -3,7 +3,7 @@ package lib
 import (
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/database"
+	"github.com/bonnyci/quartermaster/database"
 )
 
 func ListUsers() []database.UserS {

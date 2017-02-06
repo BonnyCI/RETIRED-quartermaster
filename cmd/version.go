@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/helpers"
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/helpers"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 // versionCmd represents the version command

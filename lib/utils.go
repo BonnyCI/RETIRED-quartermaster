@@ -3,7 +3,7 @@ package lib
 import (
 	"time"
 
-	"github.com/pschwartz/quartermaster/database"
+	"github.com/bonnyci/quartermaster/database"
 )
 
 const DFMT = "2006-01-02"

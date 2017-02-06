@@ -6,7 +6,7 @@ import (
 
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/pschwartz/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 func StatusHelp(i *Irc, command *Command) {

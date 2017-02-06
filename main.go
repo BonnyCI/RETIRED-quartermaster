@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/pschwartz/quartermaster/cmd"
+	"github.com/bonnyci/quartermaster/cmd"
 	jww "github.com/spf13/jwalterweatherman"
 )
 
