@@ -26,6 +26,11 @@ func GroupsListHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupsAddHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	group := params["group"]
 
@@ -53,6 +58,11 @@ func GroupsGetHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupsDelHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	group := params["group"]
 
@@ -69,6 +79,11 @@ func GroupsDelHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupsAddMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	group := params["group"]
 	user := params["user"]
@@ -91,6 +106,11 @@ func GroupsAddMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func GroupsDelMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	group := params["group"]
 	user := params["user"]

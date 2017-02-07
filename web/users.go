@@ -26,6 +26,11 @@ func UsersListHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersAddHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	user := params["user"]
 	if _, err := lib.GetUser(user); err != nil {
@@ -52,6 +57,11 @@ func UsersGetHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersDelHandleFunc(w http.ResponseWriter, r *http.Request) {
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsAdmin(aU) {
+		return
+	}
+
 	params := mux.Vars(r)
 	user := params["user"]
 

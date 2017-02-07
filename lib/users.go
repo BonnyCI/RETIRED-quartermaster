@@ -1,6 +1,9 @@
 package lib
 
 import (
+	"net/http"
+	"strconv"
+
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/database"
@@ -34,7 +37,6 @@ func AddUsers(us []string) {
 
 func delUser(us string) {
 	jww.DEBUG.Printf("Deleting user: %s", us)
-	//var u database.UserS
 	u, _ := GetUser(us)
 	u.Delete()
 }
@@ -43,4 +45,39 @@ func DelUsers(us []string) {
 	for _, u := range us {
 		delUser(u)
 	}
+}
+
+func AuthToken(us string, p string, r *http.Request) bool {
+	u, err := GetUser(us)
+
+	if err != nil {
+		jww.ERROR.Printf("Cannot load user: %s", us)
+		return false
+	}
+
+	return p == u.Token
+}
+
+func IsAdmin(user string) bool {
+	u, err := GetUser(user)
+	if err != nil {
+		return false
+	}
+
+	return UserInGroup("Admin", u)
+}
+
+func IsSelf(me, user string) bool {
+	um, err := GetUser(me)
+	if err != nil {
+		return false
+	}
+
+	u, err := GetUser(user)
+	if err != nil {
+		return false
+	}
+
+	jww.DEBUG.Printf("%s == %s : %s", u, um, strconv.FormatBool(u == um))
+	return u == um
 }
