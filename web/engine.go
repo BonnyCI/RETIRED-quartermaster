@@ -7,8 +7,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/goji/httpauth"
 	"github.com/gorilla/mux"
 	jww "github.com/spf13/jwalterweatherman"
+
+	"github.com/bonnyci/quartermaster/lib"
 )
 
 var engines = make(map[string]*Engine)
@@ -133,6 +136,12 @@ func (e *Engine) SetAddr(a string) {
 
 func (e *Engine) Start() {
 	jww.DEBUG.Println("Building HTTP Engine.")
+
+	authOpts := httpauth.AuthOptions{
+		Realm:    "quartermaster",
+		AuthFunc: lib.AuthToken,
+	}
+
 	for k, v := range e.Handlers {
 		jww.DEBUG.Printf("Adding Handler %s.", k)
 
@@ -141,5 +150,5 @@ func (e *Engine) Start() {
 		}
 	}
 	jww.INFO.Println("Starting HTTP Engine.")
-	e.Closer, _ = ListenAndServeWithClose(e.addr, e.Router)
+	e.Closer, _ = ListenAndServeWithClose(e.addr, httpauth.BasicAuth(authOpts)(e.Router))
 }

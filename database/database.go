@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/asdine/storm"
+	"github.com/asdine/storm/codec/msgpack"
 	"github.com/boltdb/bolt"
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
@@ -36,7 +37,7 @@ func CloseInstance() {
 
 func (d *Database) Open() {
 	jww.DEBUG.Println("Creating/Opening DB:", d.Db)
-	DB, err := storm.Open(d.Db, storm.AutoIncrement(),
+	DB, err := storm.Open(d.Db, storm.AutoIncrement(), storm.Codec(msgpack.Codec),
 		storm.BoltOptions(0600, &bolt.Options{Timeout: 1 * time.Second}))
 
 	if err != nil {

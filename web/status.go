@@ -25,6 +25,12 @@ func StatusUserAddHandleFunc(w http.ResponseWriter, r *http.Request) {
 	jww.DEBUG.Println("In ADD")
 	params := mux.Vars(r)
 	user := params["user"]
+
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsSelf(aU, user) {
+		return
+	}
+
 	jww.DEBUG.Println(user)
 
 	type ApiIn struct {
@@ -59,6 +65,11 @@ func StatusUserDelHandleFunc(w http.ResponseWriter, r *http.Request) {
 	user := params["user"]
 	date := params["date"]
 	index, _ := strconv.Atoi(params["index"])
+
+	aU, _, _ := r.BasicAuth()
+	if !lib.IsSelf(aU, user) {
+		return
+	}
 
 	jww.DEBUG.Println("In Del, index:", index)
 
