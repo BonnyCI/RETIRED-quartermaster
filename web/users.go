@@ -26,11 +26,6 @@ func UsersListHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersAddHandleFunc(w http.ResponseWriter, r *http.Request) {
-	aU, _, _ := r.BasicAuth()
-	if !lib.IsAdmin(aU) {
-		return
-	}
-
 	params := mux.Vars(r)
 	user := params["user"]
 	if _, err := lib.GetUser(user); err != nil {
@@ -57,11 +52,6 @@ func UsersGetHandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func UsersDelHandleFunc(w http.ResponseWriter, r *http.Request) {
-	aU, _, _ := r.BasicAuth()
-	if !lib.IsAdmin(aU) {
-		return
-	}
-
 	params := mux.Vars(r)
 	user := params["user"]
 
@@ -82,8 +72,8 @@ var usersApi = &UsersAPI{
 	Handlers: HandlersT{
 		"/users/": []HandlersS{MakeHandler("GET", UsersListHandleFunc)},
 		"/users/{user}": []HandlersS{
-			MakeHandler("PUT", UsersAddHandleFunc),
-			MakeHandler("DELETE", UsersDelHandleFunc),
+			MakeHandler("PUT", AdminMiddleware(UsersAddHandleFunc)),
+			MakeHandler("DELETE", AdminMiddleware(UsersDelHandleFunc)),
 			MakeHandler("GET", UsersGetHandleFunc),
 		},
 	},
