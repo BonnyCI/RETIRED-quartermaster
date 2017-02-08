@@ -23,7 +23,7 @@ func (h *HelpFmt) Use(i *Irc, command *Command) {
 
 func HelpHelp(i *Irc, command *Command) {
 	jww.DEBUG.Println("In HelpHelp")
-	help := "!quartermaster <cmd> {subcmd} <*args> (Commands:"
+	help := "!" + i.Conf.Me.Nick + " <cmd> {subcmd} <*args> (Commands:"
 	for k := range i.commands.Handlers.set {
 		if k == "quit" {
 			continue
@@ -49,7 +49,7 @@ func Help(i *Irc, command *Command) {
 		cmd = append([]string{}, command.Args[:1]...)
 	}
 
-	cm := NewCommand(command.Target, command.Sender, strings.Join(cmd, " "))
+	cm := NewCommand(command.Target, command.Sender, strings.Join(cmd, " "), i.Conf.Me.Nick)
 	i.help.Handlers.Dispatch(i, cm)
 
 }

@@ -94,7 +94,7 @@ func (i *Irc) Connect() {
 			}
 		}
 
-		c := NewCommand(line.Target(), line.Nick, line.Text())
+		c := NewCommand(line.Target(), line.Nick, line.Text(), i.Conf.Me.Nick)
 		i.commands.Handlers.Dispatch(i, c)
 	})
 
