@@ -116,12 +116,12 @@ func GetApi() *GroupsAPI {
 				"/groups/": []engine.HandlersS{engine.MakeHandler("GET", GroupsListHandleFunc)},
 				"/groups/{group}": []engine.HandlersS{
 					engine.MakeHandler("GET", GroupsGetHandleFunc),
-					engine.MakeHandler("POST", middleware.AdminMiddleware(GroupsAddHandleFunc)),
-					engine.MakeHandler("DELETE", middleware.AdminMiddleware(GroupsDelHandleFunc)),
+					engine.MakeHandler("POST", GroupsAddHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
+					engine.MakeHandler("DELETE", GroupsDelHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
 				},
 				"/groups/{group}/{user}": []engine.HandlersS{
-					engine.MakeHandler("POST", middleware.AdminMiddleware(GroupsAddMembersHandleFunc)),
-					engine.MakeHandler("DELETE", middleware.AdminMiddleware(GroupsDelMembersHandleFunc)),
+					engine.MakeHandler("POST", GroupsAddMembersHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
+					engine.MakeHandler("DELETE", GroupsDelMembersHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
 				},
 			},
 		},
