@@ -1,4 +1,4 @@
-package web
+package groups
 
 import (
 	"encoding/json"
@@ -9,16 +9,9 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/web/engine"
+	"github.com/bonnyci/quartermaster/web/middleware"
 )
-
-type GroupsAPI struct {
-	Name     string
-	Handlers HandlersT
-}
-
-func (u *GroupsAPI) Get() HandlersT {
-	return u.Handlers
-}
 
 func GroupsListHandleFunc(w http.ResponseWriter, r *http.Request) {
 	g, _ := lib.ListGroups()
@@ -112,18 +105,25 @@ func GroupsDelMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(g)
 }
 
-var groupsApi = &GroupsAPI{
-	Name: "groups",
-	Handlers: HandlersT{
-		"/groups/": []HandlersS{MakeHandler("GET", GroupsListHandleFunc)},
-		"/groups/{group}": []HandlersS{
-			MakeHandler("GET", GroupsGetHandleFunc),
-			MakeHandler("POST", AdminMiddleware(GroupsAddHandleFunc)),
-			MakeHandler("DELETE", AdminMiddleware(GroupsDelHandleFunc)),
+type GroupsAPI struct {
+	engine.API
+}
+
+func GetApi() *GroupsAPI {
+	return &GroupsAPI{
+		engine.APIBase{
+			Handlers: engine.HandlersT{
+				"/groups/": []engine.HandlersS{engine.MakeHandler("GET", GroupsListHandleFunc)},
+				"/groups/{group}": []engine.HandlersS{
+					engine.MakeHandler("GET", GroupsGetHandleFunc),
+					engine.MakeHandler("POST", middleware.AdminMiddleware(GroupsAddHandleFunc)),
+					engine.MakeHandler("DELETE", middleware.AdminMiddleware(GroupsDelHandleFunc)),
+				},
+				"/groups/{group}/{user}": []engine.HandlersS{
+					engine.MakeHandler("POST", middleware.AdminMiddleware(GroupsAddMembersHandleFunc)),
+					engine.MakeHandler("DELETE", middleware.AdminMiddleware(GroupsDelMembersHandleFunc)),
+				},
+			},
 		},
-		"/groups/{group}/{user}": []HandlersS{
-			MakeHandler("POST", AdminMiddleware(GroupsAddMembersHandleFunc)),
-			MakeHandler("DELETE", AdminMiddleware(GroupsDelMembersHandleFunc)),
-		},
-	},
+	}
 }

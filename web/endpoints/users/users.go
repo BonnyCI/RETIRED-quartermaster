@@ -1,4 +1,4 @@
-package web
+package users
 
 import (
 	"encoding/json"
@@ -9,16 +9,9 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/web/engine"
+	"github.com/bonnyci/quartermaster/web/middleware"
 )
-
-type UsersAPI struct {
-	Name     string
-	Handlers HandlersT
-}
-
-func (u *UsersAPI) Get() HandlersT {
-	return u.Handlers
-}
 
 func UsersListHandleFunc(w http.ResponseWriter, r *http.Request) {
 	u := lib.ListUsers()
@@ -67,14 +60,21 @@ func UsersDelHandleFunc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"Action": "User: " + user + " deleted."})
 }
 
-var usersApi = &UsersAPI{
-	Name: "users",
-	Handlers: HandlersT{
-		"/users/": []HandlersS{MakeHandler("GET", UsersListHandleFunc)},
-		"/users/{user}": []HandlersS{
-			MakeHandler("PUT", AdminMiddleware(UsersAddHandleFunc)),
-			MakeHandler("DELETE", AdminMiddleware(UsersDelHandleFunc)),
-			MakeHandler("GET", UsersGetHandleFunc),
+type UsersAPI struct {
+	engine.API
+}
+
+func GetApi() *UsersAPI {
+	return &UsersAPI{
+		engine.APIBase{
+			Handlers: engine.HandlersT{
+				"/users/": []engine.HandlersS{engine.MakeHandler("GET", UsersListHandleFunc)},
+				"/users/{user}": []engine.HandlersS{
+					engine.MakeHandler("PUT", middleware.AdminMiddleware(UsersAddHandleFunc)),
+					engine.MakeHandler("DELETE", middleware.AdminMiddleware(UsersDelHandleFunc)),
+					engine.MakeHandler("GET", UsersGetHandleFunc),
+				},
+			},
 		},
-	},
+	}
 }

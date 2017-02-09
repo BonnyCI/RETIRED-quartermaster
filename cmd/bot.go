@@ -7,7 +7,7 @@ import (
 
 	"github.com/bonnyci/quartermaster/bot"
 	"github.com/bonnyci/quartermaster/database"
-	"github.com/bonnyci/quartermaster/web"
+	"github.com/bonnyci/quartermaster/web/endpoints"
 )
 
 // getCmd represents the get command
@@ -27,8 +27,8 @@ var botCmd = &cobra.Command{
 		jww.INFO.Println("GET - Port: ", viper.GetString("port"))
 		jww.INFO.Println("GET - Debug: ", viper.GetString("debug"))
 
-		web.BackupHTTP()
-		web.ApiHTTP()
+		endpoints.BackupHTTP()
+		endpoints.ApiHTTP()
 
 		i := bot.GetIrc()
 		bot.Configure(i)

@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"encoding/json"
+	"io"
 	"time"
 
 	"github.com/bonnyci/quartermaster/database"
@@ -35,4 +37,11 @@ func In(v string, a []string) (ok bool, i int) {
 		}
 	}
 	return
+}
+
+func Build(in io.Reader, out interface{}) error {
+	if err := json.NewDecoder(in).Decode(out); err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,4 +1,4 @@
-package web
+package backup
 
 import (
 	"net/http"
@@ -7,16 +7,8 @@ import (
 	"github.com/boltdb/bolt"
 
 	"github.com/bonnyci/quartermaster/database"
+	"github.com/bonnyci/quartermaster/web/engine"
 )
-
-type BackupAPI struct {
-	Name     string
-	Handlers HandlersT
-}
-
-func (u *BackupAPI) Get() HandlersT {
-	return u.Handlers
-}
 
 func BackupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	db := database.GetInstance()
@@ -33,9 +25,16 @@ func BackupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var backupAPI = &BackupAPI{
-	Name: "backup",
-	Handlers: HandlersT{
-		"/backup/": []HandlersS{MakeHandler("GET", BackupHandleFunc)},
-	},
+type BackupAPI struct {
+	engine.API
+}
+
+func GetApi() *BackupAPI {
+	return &BackupAPI{
+		engine.APIBase{
+			Handlers: engine.HandlersT{
+				"/backup/": []engine.HandlersS{engine.MakeHandler("GET", BackupHandleFunc)},
+			},
+		},
+	}
 }

@@ -1,4 +1,4 @@
-package web
+package status
 
 import (
 	"encoding/json"
@@ -10,16 +10,8 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/web/engine"
 )
-
-type StatusAPI struct {
-	Name     string
-	Handlers HandlersT
-}
-
-func (s *StatusAPI) Get() HandlersT {
-	return s.Handlers
-}
 
 func StatusUserAddHandleFunc(w http.ResponseWriter, r *http.Request) {
 	jww.DEBUG.Println("In ADD")
@@ -39,7 +31,7 @@ func StatusUserAddHandleFunc(w http.ResponseWriter, r *http.Request) {
 
 	var in ApiIn
 
-	if err := Build(r.Body, &in); err != nil {
+	if err := lib.Build(r.Body, &in); err != nil {
 		jww.ERROR.Println(err)
 		return
 	}
@@ -132,13 +124,20 @@ func StatusBucketListHandleFunc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(buckets)
 }
 
-var statusApi = &StatusAPI{
-	Name: "status",
-	Handlers: HandlersT{
-		"/status/":                      []HandlersS{MakeHandler("GET", StatusBucketListHandleFunc)},
-		"/status/{user}":                []HandlersS{MakeHandler("POST", StatusUserAddHandleFunc)},
-		"/status/{date}":                []HandlersS{MakeHandler("GET", StatusAllGetHandleFunc)},
-		"/status/{user}/{date}":         []HandlersS{MakeHandler("GET", StatusUserGetHandleFunc)},
-		"/status/{user}/{date}/{index}": []HandlersS{MakeHandler("DELETE", StatusUserDelHandleFunc)},
-	},
+type StatusAPI struct {
+	engine.API
+}
+
+func GetApi() *StatusAPI {
+	return &StatusAPI{
+		engine.APIBase{
+			Handlers: engine.HandlersT{
+				"/status/":                      []engine.HandlersS{engine.MakeHandler("GET", StatusBucketListHandleFunc)},
+				"/status/{user}":                []engine.HandlersS{engine.MakeHandler("POST", StatusUserAddHandleFunc)},
+				"/status/{date}":                []engine.HandlersS{engine.MakeHandler("GET", StatusAllGetHandleFunc)},
+				"/status/{user}/{date}":         []engine.HandlersS{engine.MakeHandler("GET", StatusUserGetHandleFunc)},
+				"/status/{user}/{date}/{index}": []engine.HandlersS{engine.MakeHandler("DELETE", StatusUserDelHandleFunc)},
+			},
+		},
+	}
 }
