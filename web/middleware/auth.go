@@ -1,9 +1,7 @@
-package web
+package middleware
 
 import (
 	"net/http"
-
-	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/lib"
 )

@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-    "github.com/bonnyci/quartermaster/web"
+	"github.com/bonnyci/quartermaster/web/endpoints"
 )
 
 // getCmd represents the get command
@@ -22,8 +22,8 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		web.BackupHTTP()
-		web.ApiHTTP()
+		endpoints.BackupHTTP()
+		endpoints.ApiHTTP()
 
 		for {
 		}

@@ -1,4 +1,4 @@
-package web
+package notify
 
 import (
 	"encoding/json"
@@ -10,16 +10,8 @@ import (
 
 	"github.com/bonnyci/quartermaster/bot"
 	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/web/engine"
 )
-
-type NotifyAPI struct {
-	Name     string
-	Handlers HandlersT
-}
-
-func (n *NotifyAPI) Get() HandlersT {
-	return n.Handlers
-}
 
 func NotifyGroupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -41,9 +33,16 @@ func NotifyGroupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(g)
 }
 
-var notifyApi = &NotifyAPI{
-	Name: "notify",
-	Handlers: HandlersT{
-		"/notify/{group}": []HandlersS{MakeHandler("GET", NotifyGroupHandleFunc)},
-	},
+type NotifyAPI struct {
+	engine.API
+}
+
+func GetApi() *NotifyAPI {
+	return &NotifyAPI{
+		engine.APIBase{
+			Handlers: engine.HandlersT{
+				"/notify/{group}": []engine.HandlersS{engine.MakeHandler("GET", NotifyGroupHandleFunc)},
+			},
+		},
+	}
 }
