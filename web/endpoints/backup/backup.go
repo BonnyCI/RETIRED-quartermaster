@@ -8,6 +8,7 @@ import (
 
 	"github.com/bonnyci/quartermaster/database"
 	"github.com/bonnyci/quartermaster/web/engine"
+	"github.com/bonnyci/quartermaster/web/middleware"
 )
 
 func BackupHandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +34,7 @@ func GetApi() *BackupAPI {
 	return &BackupAPI{
 		engine.APIBase{
 			Handlers: engine.HandlersT{
-				"/backup/": []engine.HandlersS{engine.MakeHandler("GET", BackupHandleFunc)},
+				"/backup/": []engine.HandlersS{engine.MakeHandler("GET", BackupHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware)},
 			},
 		},
 	}

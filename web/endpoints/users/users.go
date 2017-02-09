@@ -70,8 +70,8 @@ func GetApi() *UsersAPI {
 			Handlers: engine.HandlersT{
 				"/users/": []engine.HandlersS{engine.MakeHandler("GET", UsersListHandleFunc)},
 				"/users/{user}": []engine.HandlersS{
-					engine.MakeHandler("PUT", middleware.AdminMiddleware(UsersAddHandleFunc)),
-					engine.MakeHandler("DELETE", middleware.AdminMiddleware(UsersDelHandleFunc)),
+					engine.MakeHandler("PUT", UsersAddHandleFunc, middleware.AuthAndAdmin...),
+					engine.MakeHandler("DELETE", UsersDelHandleFunc, middleware.AuthAndAdmin...),
 					engine.MakeHandler("GET", UsersGetHandleFunc),
 				},
 			},

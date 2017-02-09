@@ -11,19 +11,11 @@ import (
 
 	"github.com/bonnyci/quartermaster/lib"
 	"github.com/bonnyci/quartermaster/web/engine"
+	"github.com/bonnyci/quartermaster/web/middleware"
 )
 
 func StatusUserAddHandleFunc(w http.ResponseWriter, r *http.Request) {
-	jww.DEBUG.Println("In ADD")
-	params := mux.Vars(r)
-	user := params["user"]
-
-	aU, _, _ := r.BasicAuth()
-	if !lib.IsSelf(aU, user) {
-		return
-	}
-
-	jww.DEBUG.Println(user)
+	user, _, _ := r.BasicAuth()
 
 	type ApiIn struct {
 		Data []string `json:"data"`
@@ -54,16 +46,10 @@ func StatusUserAddHandleFunc(w http.ResponseWriter, r *http.Request) {
 
 func StatusUserDelHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	user := params["user"]
 	date := params["date"]
 	index, _ := strconv.Atoi(params["index"])
 
-	aU, _, _ := r.BasicAuth()
-	if !lib.IsSelf(aU, user) {
-		return
-	}
-
-	jww.DEBUG.Println("In Del, index:", index)
+	user, _, _ := r.BasicAuth()
 
 	u, err := lib.GetUser(user)
 	if err != nil {
@@ -132,11 +118,12 @@ func GetApi() *StatusAPI {
 	return &StatusAPI{
 		engine.APIBase{
 			Handlers: engine.HandlersT{
-				"/status/":                      []engine.HandlersS{engine.MakeHandler("GET", StatusBucketListHandleFunc)},
-				"/status/{user}":                []engine.HandlersS{engine.MakeHandler("POST", StatusUserAddHandleFunc)},
-				"/status/{date}":                []engine.HandlersS{engine.MakeHandler("GET", StatusAllGetHandleFunc)},
-				"/status/{user}/{date}":         []engine.HandlersS{engine.MakeHandler("GET", StatusUserGetHandleFunc)},
-				"/status/{user}/{date}/{index}": []engine.HandlersS{engine.MakeHandler("DELETE", StatusUserDelHandleFunc)},
+				"/status/": []engine.HandlersS{
+					engine.MakeHandler("GET", StatusBucketListHandleFunc),
+					engine.MakeHandler("POST", StatusUserAddHandleFunc, middleware.AuthMiddleware)},
+				"/status/{date}":         []engine.HandlersS{engine.MakeHandler("GET", StatusAllGetHandleFunc)},
+				"/status/{user}/{date}":  []engine.HandlersS{engine.MakeHandler("GET", StatusUserGetHandleFunc)},
+				"/status/{date}/{index}": []engine.HandlersS{engine.MakeHandler("DELETE", StatusUserDelHandleFunc, middleware.AuthMiddleware)},
 			},
 		},
 	}
