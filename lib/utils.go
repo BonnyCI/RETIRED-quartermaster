@@ -12,9 +12,18 @@ const DFMT = "2006-01-02"
 
 var DStamp = time.Now().UTC().Format(DFMT)
 
-func Remove(list []database.UserS, rm database.UserS) []database.UserS {
+func RemoveGroup(list []database.GroupS, rm database.GroupS) []database.GroupS {
 	for k, v := range list {
-		if v == rm {
+		if ok := v.Compare(rm); ok {
+			return append(list[:k], list[k+1:]...)
+		}
+	}
+	return list
+}
+
+func RemoveUser(list []database.UserS, rm database.UserS) []database.UserS {
+	for k, v := range list {
+		if ok := v.Compare(rm); ok {
 			return append(list[:k], list[k+1:]...)
 		}
 	}

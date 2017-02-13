@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/goji/httpauth"
-	"github.com/gorilla/mux"
 
 	"github.com/bonnyci/quartermaster/lib"
 )

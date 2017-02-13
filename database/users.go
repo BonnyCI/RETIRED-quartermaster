@@ -11,11 +11,20 @@ type UserS struct {
 	Token string `json:"-" storm:"unique"`
 }
 
-func (s *UserS) String() string {
+func (s UserS) String() string {
 	return "Nick(" + s.Nick + ")"
 }
 
-func (s *UserS) Save() error {
+func (s UserS) Compare(d DataS) bool {
+	c := d.(UserS)
+
+	if s == c {
+		return true
+	}
+	return false
+}
+
+func (s UserS) Save() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Saving: %+v", s)
 	if err := db.DbObj.Save(s); err != nil {
@@ -25,7 +34,7 @@ func (s *UserS) Save() error {
 	return s.GenerateToken()
 }
 
-func (s *UserS) Delete() error {
+func (s UserS) Delete() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Deleting: %+v", s)
 	if err := db.DbObj.DeleteStruct(s); err != nil {
@@ -35,7 +44,7 @@ func (s *UserS) Delete() error {
 	return nil
 }
 
-func (s *UserS) Update() error {
+func (s UserS) Update() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Updating: %+v", s)
 	if err := db.DbObj.Update(s); err != nil {
@@ -45,7 +54,7 @@ func (s *UserS) Update() error {
 	return nil
 }
 
-func (s *UserS) GenerateToken() error {
+func (s UserS) GenerateToken() error {
 	jww.DEBUG.Printf("Generating Token for %s", s.Nick)
 	jww.DEBUG.Printf("Token1 %s", s.Token)
 	if s.Token == "" {

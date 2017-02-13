@@ -8,6 +8,7 @@ import (
 	"github.com/bonnyci/quartermaster/bot"
 	"github.com/bonnyci/quartermaster/database"
 	"github.com/bonnyci/quartermaster/web/endpoints"
+	"github.com/bonnyci/quartermaster/web/endpoints/notify"
 )
 
 // getCmd represents the get command
@@ -32,7 +33,11 @@ var botCmd = &cobra.Command{
 
 		i := bot.GetIrc()
 		bot.Configure(i)
+		c := notify.NotifyCron()
+		c.Start()
 		i.Connect()
+
+		defer c.Stop()
 		defer database.CloseInstance()
 
 		return nil
