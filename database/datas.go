@@ -10,6 +10,7 @@ type DataS interface {
 	Save() error
 	Delete() error
 	Update() error
+	Compare(DataS) bool
 }
 
 func InitStatus() {

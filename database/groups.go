@@ -12,7 +12,7 @@ type GroupS struct {
 	Members []UserS `json:"members,omitempty"`
 }
 
-func (s *GroupS) String() string {
+func (s GroupS) String() string {
 	var ms []string
 
 	for _, v := range s.Members {
@@ -24,7 +24,35 @@ func (s *GroupS) String() string {
 	return "(" + s.Name + " M:" + m + ")"
 }
 
-func (s *GroupS) Save() error {
+func (s GroupS) Compare(d DataS) bool {
+	c := d.(GroupS)
+
+	if s.Name != c.Name {
+		return false
+	}
+
+	if s.Members == nil && c.Members == nil {
+		return true
+	}
+
+	if s.Members == nil || c.Members == nil {
+		return false
+	}
+
+	if len(s.Members) != len(c.Members) {
+		return false
+	}
+
+	for i := range s.Members {
+		if !s.Members[i].Compare(c.Members[i]) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (s GroupS) Save() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Saving: %+v", s)
 	if err := db.DbObj.Save(s); err != nil {
@@ -34,7 +62,7 @@ func (s *GroupS) Save() error {
 	return nil
 }
 
-func (s *GroupS) Delete() error {
+func (s GroupS) Delete() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Deleting: %+v", s)
 	if err := db.DbObj.DeleteStruct(s); err != nil {
@@ -44,7 +72,7 @@ func (s *GroupS) Delete() error {
 	return nil
 }
 
-func (s *GroupS) Update() error {
+func (s GroupS) Update() error {
 	db := GetInstance()
 	jww.DEBUG.Printf("Updating: %+v", s)
 	if err := db.DbObj.Update(s); err != nil {

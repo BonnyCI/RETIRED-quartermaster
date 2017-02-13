@@ -9,9 +9,19 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 
 	"github.com/bonnyci/quartermaster/bot"
+	"github.com/bonnyci/quartermaster/database"
 	"github.com/bonnyci/quartermaster/lib"
 	"github.com/bonnyci/quartermaster/web/engine"
 )
+
+func doNotify(g database.GroupS) {
+	jww.INFO.Printf("Notiifying members of %s, %v", g.Name, g.Members)
+	i := bot.GetIrc()
+
+	for _, v := range g.Members {
+		i.Sendf(v.Nick, "Good morning %s, your status report time is now open.", v.Nick)
+	}
+}
 
 func NotifyGroupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -24,12 +34,7 @@ func NotifyGroupHandleFunc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	i := bot.GetIrc()
-
-	for _, v := range g.Members {
-		i.Sendf(v.Nick, "Good morning %s, your status report time is now open.", v.Nick)
-	}
-
+	doNotify(g)
 	json.NewEncoder(w).Encode(g)
 }
 
@@ -45,4 +50,13 @@ func GetApi() *NotifyAPI {
 			},
 		},
 	}
+}
+
+func NotifyCron() *Cron {
+	gs, _ := lib.ListGroups()
+	g, _ := lib.GetGroup("Admin")
+
+	gs = lib.RemoveGroup(gs, g)
+	jww.DEBUG.Printf("%+v", gs)
+	return BuildStatusCron(gs)
 }

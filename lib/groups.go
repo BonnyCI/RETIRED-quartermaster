@@ -104,7 +104,7 @@ func DelUsersFromGroups(gs []string, us []string) error {
 		}
 		for _, v := range us {
 			u, _ := GetUser(v)
-			gr.Members = Remove(gr.Members, u)
+			gr.Members = RemoveUser(gr.Members, u)
 		}
 		grs = append(grs, gr)
 	}
