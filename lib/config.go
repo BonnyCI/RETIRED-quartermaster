@@ -36,4 +36,8 @@ func loadDefaultSettings() {
 	viper.SetDefault("pass", "")
 	viper.SetDefault("debug", false)
 	viper.SetDefault("standupLogs", "logs/standup-{{date}}")
+	viper.SetDefault("apiuser", "quartermaster")
+	viper.SetDefault("apipass", "quartermaster")
+	viper.SetDefault("privatekey", "$HOME/.quartermaster/token_key")
+	viper.SetDefault("publickey", "$HOME/.quartermaster/token_key.pub")
 }

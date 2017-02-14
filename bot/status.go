@@ -6,7 +6,7 @@ import (
 
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/database"
 )
 
 func StatusHelp(i *Irc, command *Command) {
@@ -20,12 +20,12 @@ func StatusHelp(i *Irc, command *Command) {
 		HelpFmt{
 			Cmd:   "status get",
 			Usage: "status get <date>",
-			Short: "Get your users status from the given date. (Format: YYYY-MM-DD, default: " + lib.DStamp,
+			Short: "Get your users status from the given date. (Format: YYYY-MM-DD, default: " + database.DStamp,
 		},
 		HelpFmt{
 			Cmd:   "status del",
 			Usage: "status del <index> <date>",
-			Short: "Delete your users status at index from the given date. (Format: YYYY-MM-DD, default: " + lib.DStamp,
+			Short: "Delete your users status at index from the given date. (Format: YYYY-MM-DD, default: " + database.DStamp,
 		},
 	}
 
@@ -41,7 +41,7 @@ func StatusAdd(i *Irc, command *Command) {
 	}
 
 	jww.DEBUG.Printf("Adding status for %s.", command.Sender)
-	u, err := lib.GetUser(command.Sender)
+	u, err := database.GetUser(command.Sender)
 	if err != nil {
 		efmt := "User (%s) is not registered."
 		jww.ERROR.Printf(efmt, command.Sender)
@@ -49,23 +49,23 @@ func StatusAdd(i *Irc, command *Command) {
 		return
 	}
 
-	sT := lib.NewStatus(u, strings.Join(command.Args, " "))
+	sT := database.NewStatus(u, strings.Join(command.Args, " "))
 	i.Sendf(command.Sender, "Status for %s recieved.", sT.Date)
 }
 
 func StatusGet(i *Irc, command *Command) {
 	if len(command.Args) == 0 {
-		command.Args = append(command.Args, lib.DStamp)
+		command.Args = append(command.Args, database.DStamp)
 	}
 	jww.DEBUG.Printf("Getting status for %s on %s", command.Sender, command.Args[0])
-	u, err := lib.GetUser(command.Sender)
+	u, err := database.GetUser(command.Sender)
 	if err != nil {
 		efmt := "User (%s) is not registered."
 		jww.ERROR.Printf(efmt, command.Sender)
 		i.Sendf(command.Target, efmt, command.Sender)
 		return
 	}
-	st := lib.GetStatus(u, command.Args[0])
+	st := database.GetStatus(u, command.Args[0])
 	i.Sendf(command.Sender, "Status for %s:", command.Args[0])
 	if len(st) == 0 {
 		i.Send(command.Sender, "No status for this date.")
@@ -83,25 +83,25 @@ func StatusDel(i *Irc, command *Command) {
 		return
 	}
 	if len(command.Args) == 1 {
-		command.Args = append(command.Args, lib.DStamp)
+		command.Args = append(command.Args, database.DStamp)
 	}
 	jww.DEBUG.Printf("Deleting status for %s at index %s for %s", command.Sender, command.Args[0], command.Args[1])
 	index, _ := strconv.Atoi(command.Args[0])
-	u, err := lib.GetUser(command.Sender)
+	u, err := database.GetUser(command.Sender)
 	if err != nil {
 		efmt := "User (%s) is not registered."
 		jww.ERROR.Printf(efmt, command.Sender)
 		i.Sendf(command.Target, efmt, command.Sender)
 		return
 	}
-	st := lib.GetStatus(u, command.Args[1])
+	st := database.GetStatus(u, command.Args[1])
 
 	if len(st) < index {
 		i.Send(command.Sender, "No status for this date.")
 		return
 	}
 
-	lib.DelStatus(st[index-1])
+	database.DelStatus(st[index-1])
 	i.Sendf(command.Sender, "Status %s for %s deleted.", command.Args[0], command.Args[1])
 }
 

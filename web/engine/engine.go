@@ -78,6 +78,8 @@ func (e *Engine) SetAddr(a string) {
 func (e *Engine) Start() {
 	jww.DEBUG.Println("Building HTTP Engine.")
 
+	e.Router.StrictSlash(true)
+
 	for k, v := range e.Handlers {
 		jww.DEBUG.Printf("Adding Handler %s.", k)
 

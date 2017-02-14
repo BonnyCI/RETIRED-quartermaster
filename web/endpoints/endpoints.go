@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/bonnyci/quartermaster/web/endpoints/auth"
 	"github.com/bonnyci/quartermaster/web/endpoints/backup"
 	"github.com/bonnyci/quartermaster/web/endpoints/groups"
 	"github.com/bonnyci/quartermaster/web/endpoints/notify"
@@ -19,6 +20,7 @@ func BackupHTTP() {
 func ApiHTTP() {
 	be := engine.GetEngine("api")
 	be.SetAddr(":8888")
+	auth.GetApi().AddToEngine(be)
 	groups.GetApi().AddToEngine(be)
 	notify.GetApi().AddToEngine(be)
 	users.GetApi().AddToEngine(be)
