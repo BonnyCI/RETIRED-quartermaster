@@ -14,6 +14,11 @@ import (
 	"github.com/bonnyci/quartermaster/helpers"
 )
 
+type ApiConfig struct {
+	User string
+	Pass string
+}
+
 type Irc struct {
 	Conf     *irc.Config
 	Conn     *irc.Conn
@@ -21,6 +26,7 @@ type Irc struct {
 	help     *Commands
 	quit     chan bool
 	in       chan string
+	Api      ApiConfig
 }
 
 var instance *Irc
@@ -28,7 +34,9 @@ var io sync.Once
 
 func GetIrc() *Irc {
 	io.Do(func() {
-		instance = &Irc{}
+		user := viper.GetString("apiuser")
+		password := viper.GetString("apipass")
+		instance = &Irc{Api: ApiConfig{user, password}}
 	})
 	return instance
 }

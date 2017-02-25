@@ -8,34 +8,76 @@ import (
 	"github.com/gorilla/mux"
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/database"
 	"github.com/bonnyci/quartermaster/web/engine"
 	"github.com/bonnyci/quartermaster/web/middleware"
 )
 
+type GroupApiIn struct {
+	Group string `json:"group"`
+}
+
+type GroupUserApiIn struct {
+	Username string `json:"username"`
+}
+
 func GroupsListHandleFunc(w http.ResponseWriter, r *http.Request) {
-	g, _ := lib.ListGroups()
+	g, _ := database.ListGroups()
 	json.NewEncoder(w).Encode(g)
 }
 
 func GroupsAddHandleFunc(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	group := params["group"]
-
-	if _, err := lib.GetGroup(group); err != nil {
-		jww.INFO.Printf("Group: %s, does not exist. Creating.", group)
-		lib.AddGroups([]string{group})
+	var in GroupApiIn
+	if err := engine.Build(r.Body, &in); err != nil {
+		jww.ERROR.Println(err)
+		return
 	}
 
-	g, _ := lib.GetGroup(group)
+	if in.Group == "" {
+		jww.ERROR.Println("Group must be set.")
+		http.Error(w, fmt.Errorf("Group must be set.").Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, err := database.GetGroup(in.Group); err != nil {
+		jww.INFO.Printf("Group: %s, does not exist. Creating.", in.Group)
+		database.AddGroups([]string{in.Group})
+	}
+
+	g, _ := database.GetGroup(in.Group)
 	json.NewEncoder(w).Encode(g)
+}
+
+func GroupsDelHandleFunc(w http.ResponseWriter, r *http.Request) {
+	var in GroupApiIn
+	if err := engine.Build(r.Body, &in); err != nil {
+		jww.ERROR.Println(err)
+		return
+	}
+
+	if in.Group == "" {
+		jww.ERROR.Println("Group must be set.")
+		http.Error(w, fmt.Errorf("Group must be set.").Error(), http.StatusBadRequest)
+		return
+	}
+
+	if _, err := database.GetGroup(in.Group); err != nil {
+		jww.ERROR.Printf("Group: %s, does not exist.", in.Group)
+		http.Error(w, fmt.Errorf("Group: %s, does not exist.", in.Group).Error(), http.StatusNotFound)
+		return
+	}
+
+	jww.INFO.Printf("Deleting Group: %s", in.Group)
+	database.DelGroups([]string{in.Group})
+
+	json.NewEncoder(w).Encode(map[string]string{"Action": "Group: " + in.Group + " deleted."})
 }
 
 func GroupsGetHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	group := params["group"]
 
-	g, err := lib.GetGroup(group)
+	g, err := database.GetGroup(group)
 	if err != nil {
 		jww.ERROR.Printf("Group: %s, does not exist.", group)
 		http.Error(w, fmt.Errorf("Group: %s, does not exist.", group).Error(), http.StatusNotFound)
@@ -45,63 +87,69 @@ func GroupsGetHandleFunc(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(g)
 }
 
-func GroupsDelHandleFunc(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	group := params["group"]
-
-	if _, err := lib.GetGroup(group); err != nil {
-		jww.ERROR.Printf("Group: %s, does not exist.", group)
-		http.Error(w, fmt.Errorf("Group: %s, does not exist.", group).Error(), http.StatusNotFound)
-		return
-	}
-
-	jww.INFO.Printf("Deleting Group: %s", group)
-	lib.DelGroups([]string{group})
-
-	json.NewEncoder(w).Encode(map[string]string{"Action": "Group: " + group + " deleted."})
-}
-
 func GroupsAddMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	group := params["group"]
-	user := params["user"]
 
-	g, err := lib.GetGroup(group)
+	var in GroupUserApiIn
+	if err := engine.Build(r.Body, &in); err != nil {
+		jww.ERROR.Println(err)
+		return
+	}
+
+	if in.Username == "" {
+		jww.ERROR.Println("Username must be set.")
+		http.Error(w, fmt.Errorf("Username must be set.").Error(), http.StatusBadRequest)
+		return
+	}
+
+	g, err := database.GetGroup(group)
 	if err != nil {
 		jww.ERROR.Printf("Group: %s, does not exist.", group)
 		http.Error(w, fmt.Errorf("Group: %s, does not exist.", group).Error(), http.StatusNotFound)
 		return
 	}
-	if _, err := lib.GetUser(user); err != nil {
-		jww.ERROR.Printf("User: %s, does not exist.", user)
-		http.Error(w, fmt.Errorf("User: %s, does not exist.", user).Error(), http.StatusNotFound)
+	if _, err := database.GetUser(in.Username); err != nil {
+		jww.ERROR.Printf("User: %s, does not exist.", in.Username)
+		http.Error(w, fmt.Errorf("User: %s, does not exist.", in.Username).Error(), http.StatusNotFound)
 		return
 	}
 
-	lib.AddUsersToGroups([]string{group}, []string{user})
-	g, _ = lib.GetGroup(group)
+	database.AddUsersToGroups([]string{group}, []string{in.Username})
+	g, _ = database.GetGroup(group)
 	json.NewEncoder(w).Encode(g)
 }
 
 func GroupsDelMembersHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	group := params["group"]
-	user := params["user"]
 
-	g, err := lib.GetGroup(group)
+	var in GroupUserApiIn
+	if err := engine.Build(r.Body, &in); err != nil {
+		jww.ERROR.Println(err)
+		return
+	}
+
+	if in.Username == "" {
+		jww.ERROR.Println("Username must be set.")
+		http.Error(w, fmt.Errorf("Username must be set.").Error(), http.StatusBadRequest)
+		return
+	}
+
+	g, err := database.GetGroup(group)
 	if err != nil {
 		jww.ERROR.Printf("Group: %s, does not exist.", group)
 		http.Error(w, fmt.Errorf("Group: %s, does not exist.", group).Error(), http.StatusNotFound)
 		return
 	}
-	if _, err := lib.GetUser(user); err != nil {
-		jww.ERROR.Printf("User: %s, does not exist.", user)
-		http.Error(w, fmt.Errorf("User: %s, does not exist.", user).Error(), http.StatusNotFound)
+	if _, err := database.GetUser(in.Username); err != nil {
+		jww.ERROR.Printf("User: %s, does not exist.", in.Username)
+		http.Error(w, fmt.Errorf("User: %s, does not exist.", in.Username).Error(), http.StatusNotFound)
 		return
 	}
 
-	lib.DelUsersFromGroups([]string{group}, []string{user})
-	g, _ = lib.GetGroup(group)
+	database.DelUsersFromGroups([]string{group}, []string{in.Username})
+	g, _ = database.GetGroup(group)
 	json.NewEncoder(w).Encode(g)
 }
 
@@ -113,15 +161,15 @@ func GetApi() *GroupsAPI {
 	return &GroupsAPI{
 		engine.APIBase{
 			Handlers: engine.HandlersT{
-				"/groups/": []engine.HandlersS{engine.MakeHandler("GET", GroupsListHandleFunc)},
+				"/groups/": []engine.HandlersS{
+					engine.MakeHandler("GET", GroupsListHandleFunc),
+					engine.MakeHandler("PUT", GroupsAddHandleFunc, middleware.AuthAndAdmin...),
+					engine.MakeHandler("DELETE", GroupsDelHandleFunc, middleware.AuthAndAdmin...),
+				},
 				"/groups/{group}": []engine.HandlersS{
 					engine.MakeHandler("GET", GroupsGetHandleFunc),
-					engine.MakeHandler("POST", GroupsAddHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
-					engine.MakeHandler("DELETE", GroupsDelHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
-				},
-				"/groups/{group}/{user}": []engine.HandlersS{
-					engine.MakeHandler("POST", GroupsAddMembersHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
-					engine.MakeHandler("DELETE", GroupsDelMembersHandleFunc, middleware.AdminMiddleware, middleware.AuthMiddleware),
+					engine.MakeHandler("PUT", GroupsAddMembersHandleFunc, middleware.AuthAndAdmin...),
+					engine.MakeHandler("DELETE", GroupsDelMembersHandleFunc, middleware.AuthAndAdmin...),
 				},
 			},
 		},

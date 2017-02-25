@@ -5,7 +5,8 @@ import (
 
 	jww "github.com/spf13/jwalterweatherman"
 
-	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/database"
+	"github.com/bonnyci/quartermaster/web/client"
 )
 
 func UsersHelp(i *Irc, command *Command) {
@@ -35,7 +36,12 @@ func UsersHelp(i *Irc, command *Command) {
 
 func UsersBase(i *Irc, command *Command) {
 	jww.DEBUG.Println("Listing Users")
-	us := lib.ListUsers()
+	us, err := client.GetUsers()
+	if err != nil {
+		jww.ERROR.Println(err)
+		i.Sendf(command.Target, "Command error: %s", err.Error())
+	}
+
 	for _, u := range us {
 		i.Sendf(command.Target, "User: %s", u.String())
 	}
@@ -47,7 +53,7 @@ func UsersAdd(i *Irc, command *Command) {
 		return
 	}
 
-	u, err := lib.GetUser(command.Sender)
+	u, err := client.GetUser(command.Sender)
 	if err != nil {
 		efmt := "User (%s) is not registered."
 		jww.ERROR.Printf(efmt, command.Sender)
@@ -55,7 +61,8 @@ func UsersAdd(i *Irc, command *Command) {
 		return
 	}
 
-	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+	g, _ := client.GetGroup("Admin")
+	if fnd := database.UserInGroup(g, u); fnd == false {
 		efmt := "User (%s) is not authorized to perform this action."
 		jww.ERROR.Printf(efmt, command.Sender)
 		i.Sendf(command.Target, efmt, command.Sender)
@@ -63,7 +70,14 @@ func UsersAdd(i *Irc, command *Command) {
 	}
 
 	jww.DEBUG.Printf("Adding User(s): %+v", command.Args)
-	lib.AddUsers(strings.Split(command.Args[0], ","))
+	for _, v := range strings.Split(command.Args[0], ",") {
+		_, err := client.AddUser(i.Api.User, i.Api.Pass, v)
+		if err != nil {
+			efmt := "Failed to create user: %s"
+			jww.ERROR.Printf(efmt, v)
+			i.Sendf(command.Target, efmt, v)
+		}
+	}
 }
 
 func UsersDel(i *Irc, command *Command) {
@@ -71,7 +85,7 @@ func UsersDel(i *Irc, command *Command) {
 		UsersHelp(i, command)
 		return
 	}
-	u, err := lib.GetUser(command.Sender)
+	u, err := client.GetUser(command.Sender)
 	if err != nil {
 		efmt := "User (%s) is not registered."
 		jww.ERROR.Printf(efmt, command.Sender)
@@ -79,14 +93,23 @@ func UsersDel(i *Irc, command *Command) {
 		return
 	}
 
-	if fnd := lib.UserInGroup("Admin", u); fnd == false {
+	g, _ := client.GetGroup("Admin")
+	if fnd := database.UserInGroup(g, u); fnd == false {
 		efmt := "User (%s) is not authorized to perform this action."
 		jww.ERROR.Printf(efmt, command.Sender)
 		i.Sendf(command.Target, efmt, command.Sender)
 		return
 	}
 	jww.DEBUG.Printf("Deleting User(s): %+v", command.Args)
-	lib.DelUsers(strings.Split(command.Args[0], ","))
+
+	for _, v := range strings.Split(command.Args[0], ",") {
+		err := client.DelUser(i.Api.User, i.Api.Pass, v)
+		if err != nil {
+			efmt := "Failed to delete user: %s"
+			jww.ERROR.Printf(efmt, v)
+			i.Sendf(command.Target, efmt, v)
+		}
+	}
 }
 
 func Users(i *Irc, command *Command) {

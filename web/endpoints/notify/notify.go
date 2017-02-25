@@ -10,7 +10,6 @@ import (
 
 	"github.com/bonnyci/quartermaster/bot"
 	"github.com/bonnyci/quartermaster/database"
-	"github.com/bonnyci/quartermaster/lib"
 	"github.com/bonnyci/quartermaster/web/engine"
 )
 
@@ -27,7 +26,7 @@ func NotifyGroupHandleFunc(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	group := params["group"]
 
-	g, err := lib.GetGroup(group)
+	g, err := database.GetGroup(group)
 	if err != nil {
 		jww.ERROR.Printf("Group: %s, does not exist.", group)
 		http.Error(w, fmt.Errorf("Group: %s, does not exist.", group).Error(), http.StatusNotFound)
@@ -53,10 +52,10 @@ func GetApi() *NotifyAPI {
 }
 
 func NotifyCron() *Cron {
-	gs, _ := lib.ListGroups()
-	g, _ := lib.GetGroup("Admin")
+	gs, _ := database.ListGroups()
+	g, _ := database.GetGroup("Admin")
 
-	gs = lib.RemoveGroup(gs, g)
+	gs = database.RemoveGroup(gs, g)
 	jww.DEBUG.Printf("%+v", gs)
 	return BuildStatusCron(gs)
 }

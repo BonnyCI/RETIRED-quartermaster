@@ -5,7 +5,7 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 
-	"github.com/bonnyci/quartermaster/lib"
+	"github.com/bonnyci/quartermaster/database"
 )
 
 type Group struct {
@@ -13,8 +13,12 @@ type Group struct {
 	Users []string
 }
 
+type User struct {
+	Username string
+	Password string
+}
 type Data struct {
-	Users  []string
+	Users  []User
 	Groups []Group
 }
 
@@ -34,15 +38,18 @@ var initCmd = &cobra.Command{
 			panic(err)
 		}
 
-		lib.AddUsers(dat.Users)
-
-		for _, v := range dat.Groups {
-			lib.AddGroups([]string{v.Name})
-			lib.AddUsersToGroups([]string{v.Name}, v.Users)
+		for _, v := range dat.Users {
+			database.AddUsers([]string{v.Username})
+			database.AddPassword(v.Username, v.Password)
 		}
 
 		for _, v := range dat.Groups {
-			g, err := lib.GetGroup(v.Name)
+			database.AddGroups([]string{v.Name})
+			database.AddUsersToGroups([]string{v.Name}, v.Users)
+		}
+
+		for _, v := range dat.Groups {
+			g, err := database.GetGroup(v.Name)
 			if err != nil {
 				jww.ERROR.Println(err)
 			}
