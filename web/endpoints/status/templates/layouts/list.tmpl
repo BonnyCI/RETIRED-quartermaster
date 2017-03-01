@@ -1,0 +1,11 @@
+{{ define "title" }}
+  <title>Status Date List</title>
+{{ end }}
+
+{{define "content"}}
+<ul>
+{{range $date := .Dates}}
+        <li><a href="/{{$date}}">{{$date}}</a></li>
+{{end}}
+</ul>
+{{end}}
