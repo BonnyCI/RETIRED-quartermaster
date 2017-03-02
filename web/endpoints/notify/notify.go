@@ -18,7 +18,7 @@ func doNotify(g database.GroupS) {
 	i := bot.GetIrc()
 
 	for _, v := range g.Members {
-		i.Sendf(v.Nick, "Good morning %s, your status report time is now open.", v.Nick)
+		i.Sendf(v.Nick, "Good morning %s, your status report time is now open. Usage: `status add <status message>`", v.Nick)
 	}
 }
 
