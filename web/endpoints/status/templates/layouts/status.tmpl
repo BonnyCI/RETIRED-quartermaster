@@ -1,0 +1,18 @@
+{{ define "title" }}
+  <title>Status {{ .Date }}</title>
+{{ end }}
+
+{{ define "content" }}
+{{ .Date }}
+<ul>
+{{ range $user, $status := .Users }}
+<li>{{ $user }}
+<ul>
+{{ range $status }}
+        <li>{{ .Status }}</li>
+{{ end }}
+</ul>
+</li>
+{{ end }}
+</ul>
+{{ end }}
